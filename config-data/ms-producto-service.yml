@@ -1,15 +1,15 @@
 server:
-  port: 8081
+  port: 8083
 spring:
   application:
-    name: ms-catalogo-service
+    name: ms-producto-service
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
   datasource:
-    url: jdbc:mysql://localhost:3306/ms_catalogo
+    url: jdbc:mysql://localhost:3306/ms_producto
     username: root
     password: ""
     driver-class-name: com.mysql.cj.jdbc.Driver
