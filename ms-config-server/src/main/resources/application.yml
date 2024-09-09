@@ -8,7 +8,7 @@
       config:
         server:
           git:
-            uri: https://github.com/YamilV18/Microservicios-DAD.git # ruta del repositorio git
+            uri: https://github.com/cdraul1045/DAD-2024-2.git # ruta del repositorio git
             searchPaths: config-data
             #username:
             #password:
