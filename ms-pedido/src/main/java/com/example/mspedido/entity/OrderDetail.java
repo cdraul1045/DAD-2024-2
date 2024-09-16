@@ -6,20 +6,18 @@ import lombok.Data;
 
 @Entity
 @Data
-public class PedidoDetalle {
+public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Integer id;
-    private Double cantidad;
-    private Double precio;
+    private Integer quantity;
+    private Double price;
     private Integer productId;
     @Transient
     private Product product;
 
-
-    public PedidoDetalle() {
-        this.cantidad = (double) 0;
-        this.precio = (double) 0;
+    public OrderDetail() {
+        this.quantity = 0;
+        this.price = 0.0;
     }
 }

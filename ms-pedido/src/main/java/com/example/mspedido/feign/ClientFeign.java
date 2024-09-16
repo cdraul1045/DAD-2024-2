@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "ms-cliente-service", path = "/cliente")
+import java.util.Optional;
+
+@FeignClient(name = "ms-cliente-service", path = "/client")
 public interface ClientFeign {
     @GetMapping("/{id}")
-    public ResponseEntity<Client> listById(@PathVariable(required = true) Integer id);
+    public ResponseEntity<Optional<Client>> getById(@PathVariable Integer id);
 }
