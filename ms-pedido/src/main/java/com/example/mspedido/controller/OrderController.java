@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/pedido")
+@RequestMapping("/order")
 public class OrderController {
     @Autowired
     private OrderService orderService;

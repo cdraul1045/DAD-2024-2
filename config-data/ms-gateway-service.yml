@@ -5,11 +5,19 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8090/eureka
+      #defaultZone: http://localhost:8090/eureka
+      defaultZone: ${EUREKA_URI:http://localhost:8090/eureka}
   instance:
-    hostname: localhost
+    #hostname: localhost
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /doc/swagger-ui.html
 spring:
   application:
     name: ms-gateway-service
@@ -19,10 +27,13 @@ spring:
         locator:
           enable: true
       routes:
-        - id: ms-catalogo-service
+        - id: ms-catalogo-service-category
           uri: lb://ms-catalogo-service
           predicates:
             - Path=/category/**
+        - id: ms-catalogo-service-product
+          uri: lb://ms-catalogo-service
+          predicates:
             - Path=/product/**
         - id: ms-cliente-service
           uri: lb://ms-cliente-service

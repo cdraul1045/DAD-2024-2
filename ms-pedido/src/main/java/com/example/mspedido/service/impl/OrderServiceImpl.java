@@ -8,6 +8,7 @@ import com.example.mspedido.feign.ClientFeign;
 import com.example.mspedido.feign.ProductFeign;
 import com.example.mspedido.repository.OrderRepository;
 import com.example.mspedido.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,22 +33,32 @@ public class OrderServiceImpl implements OrderService {
         // Para cada orden en la lista, obtenemos los detalles del cliente y productos
         return orders.stream().map(order -> {
             // Obtener cliente
-            ResponseEntity<Optional<Client>> clientResponse = clientFeign.getById(order.getClientId());
+            ResponseEntity<Client> clientResponse = clientFeign.getById(order.getClientId());
             if (clientResponse.getStatusCode().is2xxSuccessful()) {
-                Optional<Client> client = clientResponse.getBody();
-                if (client.isPresent()) {
-                    order.setClient(client.get());
+                Client client = clientResponse.getBody();
+                if (client != null) {
+                    order.setClient(client);
+                    System.out.println("Cliente obtenido: " + client); // Log para verificar cliente
+                } else {
+                    System.out.println("Cliente es null"); // Log para verificar si es null
                 }
+            } else {
+                System.out.println("Error al obtener cliente: " + clientResponse.getStatusCode()); // Log para verificar error
             }
 
             // Obtener productos en cada detalle
             List<OrderDetail> orderDetails = order.getDetail().stream().map(orderDetail -> {
-                ResponseEntity<Optional<Product>> productResponse = productFeign.getById(orderDetail.getProductId());
+                ResponseEntity<Product> productResponse = productFeign.getById(orderDetail.getProductId());
                 if (productResponse.getStatusCode().is2xxSuccessful()) {
-                    Optional<Product> product = productResponse.getBody();
-                    if (product.isPresent()) {
-                        orderDetail.setProduct(product.get());
+                    Product product = productResponse.getBody();
+                    if (product != null) {
+                        orderDetail.setProduct(product);
+                        System.out.println("Producto obtenido: " + product); // Log para verificar producto
+                    } else {
+                        System.out.println("Producto es null"); // Log para verificar si es null
                     }
+                } else {
+                    System.out.println("Error al obtener producto: " + productResponse.getStatusCode()); // Log para verificar error
                 }
                 return orderDetail;
             }).collect(Collectors.toList());
@@ -59,34 +70,39 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
+    @CircuitBreaker(name = "clientService", fallbackMethod = "clientFallback")
     public Optional<Order> findById(Integer id) {
         Optional<Order> orderOpt = orderRepository.findById(id);
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
 
             // Obtener cliente
-            ResponseEntity<Optional<Client>> clientResponse = clientFeign.getById(order.getClientId());
+            ResponseEntity<Client> clientResponse = clientFeign.getById(order.getClientId());
             if (clientResponse.getStatusCode().is2xxSuccessful()) {
-                Optional<Client> client = clientResponse.getBody();
-                if (client.isPresent()) {
-                    order.setClient(client.get());
+                Client client = clientResponse.getBody();
+                if (client != null) {
+                    order.setClient(client);
                     System.out.println("Cliente obtenido: " + client); // Log para verificar cliente
                 } else {
                     System.out.println("Cliente es null"); // Log para verificar si es null
                 }
+            } else {
+                System.out.println("Error al obtener cliente: " + clientResponse.getStatusCode()); // Log para verificar error
             }
 
             // Obtener productos
             List<OrderDetail> orderDetails = order.getDetail().stream().map(orderDetail -> {
-                ResponseEntity<Optional<Product>> productResponse = productFeign.getById(orderDetail.getProductId());
+                ResponseEntity<Product> productResponse = productFeign.getById(orderDetail.getProductId());
                 if (productResponse.getStatusCode().is2xxSuccessful()) {
-                    Optional<Product> product = productResponse.getBody();
-                    if (product.isPresent()) {
-                        orderDetail.setProduct(product.get());
+                    Product product = productResponse.getBody();
+                    if (product != null) {
+                        orderDetail.setProduct(product);
                         System.out.println("Producto obtenido: " + product); // Log para verificar producto
                     } else {
                         System.out.println("Producto es null"); // Log para verificar si es null
                     }
+                } else {
+                    System.out.println("Error al obtener producto: " + productResponse.getStatusCode()); // Log para verificar error
                 }
                 return orderDetail;
             }).collect(Collectors.toList());
