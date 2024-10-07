@@ -32,15 +32,8 @@ public class AuthUserServiceImpl implements AuthUserService {
                 .userName(authUserDto.getUserName())
                 .password(password)
                 .build();
-
-
-
-
         return authUserRepository.save(authUser);
     }
-
-
-
 
     @Override
     public TokenDto login(AuthUserDto authUserDto) {
@@ -51,9 +44,6 @@ public class AuthUserServiceImpl implements AuthUserService {
             return new TokenDto(jwtProvider.createToken(user.get()));
         return null;
     }
-
-
-
 
     @Override
     public TokenDto validate(String token) {
